@@ -8,6 +8,7 @@ import com.woorea.openstack.cinder.model.ConnectionForInitialize;
 import com.woorea.openstack.cinder.model.ConnectionInfo;
 import com.woorea.openstack.cinder.model.Metadata;
 import com.woorea.openstack.cinder.model.Volume;
+import com.woorea.openstack.cinder.model.VolumeAction.Migrate;
 import com.woorea.openstack.cinder.model.VolumeForCreate;
 import com.woorea.openstack.cinder.model.VolumeForExtend;
 import com.woorea.openstack.cinder.model.VolumeForImageCreate;
@@ -146,4 +147,35 @@ public class VolumesExtension {
 
     }
 
+    /**
+     * The base class for Volume actions.
+     */
+	public abstract class Action<T> extends OpenStackRequest<T> {
+
+		public Action(String id, Entity<?> entity, Class<T> returnType) {
+			super(CLIENT, HttpMethod.POST, new StringBuilder("/volumes/").append(id).append("/action"), entity, returnType);
+		}
+	}
+
+    public class MigrateAction extends Action<Void> {
+
+		 public MigrateAction(Migrate action) {
+			 super(action.getVolume(), Entity.json(action), Void.class);
+		 }
+	 }
+
+    /**
+     * This method creates a MigrateAction object.
+     *
+     * @param volumeId The ID of the volume to migrate
+     * @param destPool The destination pool name
+     *
+     * @return The MigrateAction object
+     */
+	 public MigrateAction migrate(String volumeId, String destPool) {
+		 Migrate migrate = new Migrate();
+		 migrate.setHost(destPool);
+		 migrate.setVolume(volumeId);
+		 return new MigrateAction(migrate);
+	 }
 }
