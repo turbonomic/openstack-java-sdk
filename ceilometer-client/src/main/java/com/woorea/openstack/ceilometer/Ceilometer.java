@@ -17,12 +17,22 @@ public class Ceilometer extends OpenStackClient {
 		METERS = new MetersResource(this);
 		RESOURCES = new ResourcesResource(this);
 	}
-	
+	public Ceilometer(String endpoint, OpenStackClientConnector connector,
+			int httpConnectionTimeout, int httpSocketTimeout) {
+		super(endpoint, connector, httpConnectionTimeout, httpSocketTimeout);
+		METERS = new MetersResource(this);
+		RESOURCES = new ResourcesResource(this);
+	}
+
 	public Ceilometer(String endpoint) {
 		this(endpoint, null);
 		
 	}
-	
+
+	public Ceilometer(String endpoint, int httpConnectionTimeout, int httpSocketTimeout) {
+		this(endpoint, null, httpConnectionTimeout, httpSocketTimeout);
+	}
+
 	public ResourcesResource resources() {
 		return RESOURCES;
 	}

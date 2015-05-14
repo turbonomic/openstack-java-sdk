@@ -43,6 +43,7 @@ public class JerseyConnector implements OpenStackClientConnector {
 
 	@Override
 	public <T> OpenStackResponse request(OpenStackRequest<T> request) {
+		// TODO Implement the timeout for the HTTP client.
 		WebResource target = client.resource(request.endpoint()).path(request.path());
 		for(Map.Entry<String, List<Object> > entry : request.queryParams().entrySet()) {
 			for (Object o : entry.getValue()) {
@@ -100,5 +101,29 @@ public class JerseyConnector implements OpenStackClientConnector {
 		public ObjectMapper getContext(Class<?> type) {
 			return type.getAnnotation(JsonRootName.class) == null ? DEFAULT_MAPPER : WRAPPED_MAPPER;
 		}
+	}
+	
+	@Override
+	public void setHttpConnectionTimeout(int httpConnectionTimeout) {
+		// TODO Implement the timeout for the HTTP client.
+
+	}
+
+	@Override
+	public int getHttpConnectionTimeout() {
+		// TODO Implement the timeout for the HTTP client.
+		return 0;
+	}
+
+	@Override
+	public void setHttpSocketTimeout(int httpSocketTimeout) {
+		// TODO Implement the timeout for the HTTP client.
+
+	}
+
+	@Override
+	public int getHttpSocketTimeout() {
+		// TODO Implement the timeout for the HTTP client.
+		return 0;
 	}
 }

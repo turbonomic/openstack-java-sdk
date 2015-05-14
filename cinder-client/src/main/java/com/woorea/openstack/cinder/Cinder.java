@@ -24,8 +24,22 @@ public class Cinder extends OpenStackClient {
         SCHEDULER_STATS = new SchedulerStatsExtension(this);
     }
 
+    public Cinder(String endpoint, OpenStackClientConnector connector,
+    		int httpConnectionTimeout, int httpSocketTimeout) {
+    	super(endpoint, connector, httpConnectionTimeout, httpSocketTimeout);
+    	VOLUMES = new VolumesExtension(this);
+        SNAPSHOTS = new SnapshotsExtension(this);
+        VOLUME_TYPES = new VolumeTypesExtension(this);
+        LIMITS = new LimitsExtension(this);
+        SCHEDULER_STATS = new SchedulerStatsExtension(this);
+    }
+    
     public Cinder(String endpoint) {
         this(endpoint, null);
+    }
+    
+    public Cinder(String endpoint, int httpConnectionTimeout, int httpSocketTimeout) {
+        this(endpoint, null, httpConnectionTimeout, httpSocketTimeout);
     }
 
     public final VolumesExtension volumes() {

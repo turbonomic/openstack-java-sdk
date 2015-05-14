@@ -37,6 +37,14 @@ public class OpenStackClient {
 		this.connector = (connector == null) ? DEFAULT_CONNECTOR : connector;
 	}
 
+	public OpenStackClient(String endpoint, OpenStackClientConnector connector, int httpConnectionTimeout, int httpSocketTimeout) {
+		this.endpoint = endpoint;
+		this.connector = (connector == null) ? DEFAULT_CONNECTOR : connector;
+
+		this.connector.setHttpConnectionTimeout(httpConnectionTimeout);
+		this.connector.setHttpSocketTimeout(httpSocketTimeout);
+	}
+	
 	public <T> OpenStackResponse request(OpenStackRequest<T> request) {
 		OpenStackResponseException authException = null;
 

@@ -33,9 +33,24 @@ public class Keystone extends OpenStackClient {
 		SERVICES = new ServicesResource(this);
 		ENDPOINTS = new EndpointsResource(this);
 	}
+
+	public Keystone(String endpoint, OpenStackClientConnector connector,
+			int httpConnectionTimeout, int httpSocketTimeout) {
+		super(endpoint, connector, httpConnectionTimeout, httpSocketTimeout);
+		TOKENS = new TokensResource(this);
+		TENANTS = new TenantsResource(this);
+		USERS = new UsersResource(this);
+		ROLES = new RolesResource(this);
+		SERVICES = new ServicesResource(this);
+		ENDPOINTS = new EndpointsResource(this);
+	}
 	
 	public Keystone(String endpoint) {
 		this(endpoint, null);
+	}
+	
+	public Keystone(String endpoint, int httpConnectionTimeout, int httpSocketTimeout) {
+		this(endpoint, null, httpConnectionTimeout, httpSocketTimeout);
 	}
 	
 	public TokensResource tokens() {

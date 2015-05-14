@@ -69,9 +69,33 @@ public class Nova extends OpenStackClient {
 		SERVICES = new ServicesResource(this);
 		HYPERVISORS = new HypervisorsResource(this);
 	}
-	
+
+	public Nova(String endpoint, OpenStackClientConnector connector,
+			int httpConnectionTimeout, int httpSocketTimeout) {
+		super(endpoint, connector, httpConnectionTimeout, httpSocketTimeout);
+		EXTENSIONS = new ExtensionsResource(this);
+		SERVERS = new ServersResource(this);
+		IMAGES = new ImagesResource(this);
+		FLAVORS = new FlavorsResource(this);
+		KEY_PAIRS = new KeyPairsExtension(this);
+		FLOATING_IPS = new FloatingIpsExtension(this);
+		SECURITY_GROUPS = new SecurityGroupsExtension(this);
+		SNAPSHOTS = new SnapshotsExtension(this);
+		VOLUMES = new VolumesExtension(this);
+		AGGREGATES = new AggregatesExtension(this);
+		QUOTA_SETS = new QuotaSetsResource(this);
+		HOSTS = new HostsExtension(this);
+		SERVER_GROUPS = new ServerGroupsExtension(this);
+		SERVICES = new ServicesResource(this);
+		HYPERVISORS = new HypervisorsResource(this);
+	}
+
 	public Nova(String endpoint) {
 		this(endpoint, null);
+	}
+
+	public Nova(String endpoint, int httpConnectionTimeout, int httpSocketTimeout) {
+		this(endpoint, null, httpConnectionTimeout, httpSocketTimeout);
 	}
 	
 	public ExtensionsResource extensions() {

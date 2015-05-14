@@ -1,21 +1,30 @@
 package com.woorea.openstack.connector;
 
+import java.net.SocketTimeoutException;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.TimeoutException;
 
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.ext.ContextResolver;
 
+import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.HttpStatus;
+import org.apache.http.conn.ConnectTimeoutException;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jackson.map.annotate.JsonRootName;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
+import org.jboss.resteasy.client.ClientExecutor;
 import org.jboss.resteasy.client.ClientRequest;
 import org.jboss.resteasy.client.ClientResponse;
+import org.jboss.resteasy.client.core.executors.ApacheHttpClient4Executor;
 import org.jboss.resteasy.plugins.providers.InputStreamProvider;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
@@ -29,6 +38,12 @@ public class RESTEasyConnector implements OpenStackClientConnector {
 	public static ObjectMapper DEFAULT_MAPPER;
 
 	public static ObjectMapper WRAPPED_MAPPER;
+
+    // The HTTP client connection timeout (in milliseconds) used in an OpenStack request
+	private int httpConnectionTimeout = -1;
+
+    // The HTTP client socket timeout (in milliseconds) used in an OpenStack request
+	private int httpSocketTimeout = -1;
 
 	static class OpenStackProviderFactory extends ResteasyProviderFactory {
 
@@ -80,8 +95,23 @@ public class RESTEasyConnector implements OpenStackClientConnector {
 	}
 
 	public <T> OpenStackResponse request(OpenStackRequest<T> request) {
-		ClientRequest client = new ClientRequest(UriBuilder.fromUri(request.endpoint() + "/" + request.path()),
-				ClientRequest.getDefaultExecutor(), providerFactory);
+
+		// Generate a Client Request object with the timeout settings
+		DefaultHttpClient httpClient = new DefaultHttpClient();
+		HttpParams params = httpClient.getParams();
+
+		if (httpConnectionTimeout >= 0) {
+			HttpConnectionParams.setConnectionTimeout(params, httpConnectionTimeout);
+		}
+
+		if (httpSocketTimeout >= 0) {
+			HttpConnectionParams.setSoTimeout(params, httpSocketTimeout);
+		}
+
+		ClientExecutor executor = new ApacheHttpClient4Executor(httpClient);
+
+		ClientRequest client = new ClientRequest(UriBuilder.fromUri(
+		        request.endpoint() + "/" + request.path()), executor, providerFactory);
 
 		for(Map.Entry<String, List<Object> > entry : request.queryParams().entrySet()) {
 			for (Object o : entry.getValue()) {
@@ -105,6 +135,10 @@ public class RESTEasyConnector implements OpenStackClientConnector {
 
 		try {
 			response = client.httpMethod(request.method().name(), request.returnType());
+		} catch (ConnectTimeoutException e) {
+			throw new RuntimeException("Connection timeout exception", e);
+		} catch (SocketTimeoutException e) {
+			throw new RuntimeException("Socket timeout exception", e);
 		} catch (Exception e) {
 			throw new RuntimeException("Unexpected client exception", e);
 		}
@@ -122,4 +156,23 @@ public class RESTEasyConnector implements OpenStackClientConnector {
 				.getReasonPhrase(), response.getStatus());
 	}
 
+	@Override
+	public void setHttpConnectionTimeout(int httpConnectionTimeout) {
+		this.httpConnectionTimeout = httpConnectionTimeout;
+	}
+
+	@Override
+	public int getHttpConnectionTimeout() {
+		return httpConnectionTimeout;
+	}
+
+	@Override
+	public void setHttpSocketTimeout(int httpSocketTimeout) {
+		this.httpSocketTimeout = httpSocketTimeout;
+	}
+
+	@Override
+	public int getHttpSocketTimeout() {
+		return httpSocketTimeout;
+	}
 }

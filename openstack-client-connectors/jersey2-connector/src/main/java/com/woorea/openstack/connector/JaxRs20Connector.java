@@ -26,6 +26,7 @@ public class JaxRs20Connector implements OpenStackClientConnector {
 
 	@Override
 	public <T> OpenStackResponse request(OpenStackRequest<T> request) {
+		// TODO Implement the timeout for the HTTP client.
 		WebTarget target = client.target(request.endpoint()).path(request.path());
 
 		for(Map.Entry<String, List<Object> > entry : request.queryParams().entrySet()) {
@@ -61,5 +62,29 @@ public class JaxRs20Connector implements OpenStackClientConnector {
 			throw new OpenStackResponseException(e.getResponse()
 					.getStatusInfo().toString(), e.getResponse().getStatus());
 		}
+	}
+	
+	@Override
+	public void setHttpConnectionTimeout(int httpConnectionTimeout) {
+		// TODO Implement the timeout for the HTTP client.
+
+	}
+
+	@Override
+	public int getHttpConnectionTimeout() {
+		// TODO Implement the timeout for the HTTP client.
+		return 0;
+	}
+
+	@Override
+	public void setHttpSocketTimeout(int httpSocketTimeout) {
+		// TODO Implement the timeout for the HTTP client.
+
+	}
+
+	@Override
+	public int getHttpSocketTimeout() {
+		// TODO Implement the timeout for the HTTP client.
+		return 0;
 	}
 }

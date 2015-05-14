@@ -1,5 +1,6 @@
 package com.woorea.openstack.keystone.v3;
 
+import com.woorea.openstack.keystone.api.TenantsResource;
 import com.woorea.openstack.keystone.v3.api.DomainsResource;
 import com.woorea.openstack.keystone.v3.api.EndpointsResource;
 import com.woorea.openstack.keystone.v3.api.RolesResource;
@@ -36,9 +37,25 @@ public class Keystone extends OpenStackClient {
 		SERVICES = new ServicesResource(this);
 		ENDPOINTS = new EndpointsResource(this);
 	}
+
+	public Keystone(String endpoint, OpenStackClientConnector connector,
+			int httpConnectionTimeout, int httpSocketTimeout) {
+		super(endpoint, connector, httpConnectionTimeout, httpSocketTimeout);
+		TOKENS = new TokensResource(this);
+		DOMAINS = new DomainsResource(this);
+		PROJECTS = new ProjectsResource(this);
+		USERS = new UsersResource(this);
+		ROLES = new RolesResource(this);
+		SERVICES = new ServicesResource(this);
+		ENDPOINTS = new EndpointsResource(this);
+	}
 	
 	public Keystone(String endpoint) {
 		this(endpoint, null);
+	}
+	
+	public Keystone(String endpoint, int httpConnectionTimeout, int httpSocketTimeout) {
+		this(endpoint, null, httpConnectionTimeout, httpSocketTimeout);
 	}
 	
 	public TokensResource tokens() {

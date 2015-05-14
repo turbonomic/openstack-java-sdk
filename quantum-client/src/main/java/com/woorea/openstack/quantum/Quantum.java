@@ -24,11 +24,23 @@ public class Quantum extends OpenStackClient {
 		PORTS = new PortsResource(this);
 		SUBNETS = new SubnetsResource(this);
 		ROUTERS=new RoutersResource(this);	
-		
+	}
+
+	public Quantum(String endpoint, OpenStackClientConnector connector,
+	               int httpConnectionTimeout, int httpSocketTimeout) {
+		super(endpoint, connector, httpConnectionTimeout, httpSocketTimeout);
+		NETWORKS = new NetworksResource(this);
+		PORTS = new PortsResource(this);
+		SUBNETS = new SubnetsResource(this);
+		ROUTERS=new RoutersResource(this);	
 	}
 	
 	public Quantum(String endpoint) {
 		this(endpoint, null);
+	}
+
+	public Quantum(String endpoint, int httpConnectionTimeout, int httpSocketTimeout) {
+		this(endpoint, null, httpConnectionTimeout, httpSocketTimeout);
 	}
 	
 	public NetworksResource networks() {
